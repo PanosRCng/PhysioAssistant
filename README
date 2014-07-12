@@ -1,0 +1,31 @@
+PhsioAssistant
+
+
+  - a contact management and booking tool for android
+
+
+
+  - java / eclipse android project
+
+
+  - requirements
+
+	- java jdk
+
+	- android sdk
+
+		- android api 17 (4.2.2)
+
+		- android support repository
+
+  		- android support library
+
+
+			- the android-support-v7/
+						/ appcompact
+						/ gridlayout
+						/ mediaroute
+							     ... projects imported in the workspace
+
+					(get them from that location -> androidsdk/extras/android/support/v7/ )
+
