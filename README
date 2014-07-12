@@ -14,18 +14,18 @@ PhysioAssistant
 
 	- android sdk
 
-		- android api 17 (4.2.2)
+	  - android api 17 (4.2.2)
 
-		- android support repository
+	  - android support repository
 
-  		- android support library
+  	  - android support library
 
 
-			- the android-support-v7/
-						/ appcompact
-						/ gridlayout
-						/ mediaroute
-							     ... projects imported in the workspace
+	    - the android-support-v7/
+				    / appcompact
+				    / gridlayout
+			            / mediaroute
+				    ... projects imported in the workspace
 
-					(get them from that location -> androidsdk/extras/android/support/v7/ )
+	      (get them from that location -> androidsdk/extras/android/support/v7/ )
 
