@@ -96,6 +96,10 @@ public class TitlesFragment extends ListFragment
 					showPatientsFragment();
 					break;
 					
+				case 1:
+					showPatientEditFragment();
+					break;
+					
 				case 2:			
 					//
 					break;
@@ -103,7 +107,7 @@ public class TitlesFragment extends ListFragment
 				case 4:			
 					showAboutFragment();
 		            break;
-					
+		            
 				default:			
 					//
 					break;
@@ -129,6 +133,18 @@ public class TitlesFragment extends ListFragment
         // Execute a transaction, replacing any existing fragment with this inside the frame.
 		FragmentTransaction ft = getFragmentManager().beginTransaction();
 		ft.replace(R.id.content, patientsFragment, "PatientsFragment");
+		ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+		ft.commit();
+    }
+    
+    private void showPatientEditFragment()
+    {
+		// Make new fragment to show this selection.
+		PatientEditFragment patientEditFragment = PatientEditFragment.newInstance();
+		
+        // Execute a transaction, replacing any existing fragment with this inside the frame.
+		FragmentTransaction ft = getFragmentManager().beginTransaction();
+		ft.replace(R.id.content, patientEditFragment, "PatientEditFragment");
 		ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
 		ft.commit();
     }

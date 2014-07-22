@@ -1,8 +1,8 @@
 package com.panosrcng.physioassistant;
 
-import java.util.Arrays;
 import java.util.List;
 
+import com.google.gson.Gson;
 import com.panosrcng.physioassistant.R;
 
 import android.content.Context;
@@ -16,21 +16,14 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-
 public class PatientsFragment extends ListFragment
-{
-    /**
-     * Create a new instance of DetailsFragment, initialized to
-     * show the text at 'index'.
+{	
+    /*
+     * Create a new instance of PatientsFragment
      */
     public static PatientsFragment newInstance()
     {
     	PatientsFragment f = new PatientsFragment();
-
-        // Supply index input as an argument.
-    //    Bundle args = new Bundle();
-    //    args.putInt("index", index);
-    //    f.setArguments(args);
 
         return f;
     }
@@ -57,22 +50,36 @@ public class PatientsFragment extends ListFragment
         
         ListView listView = (ListView) view.findViewById(android.R.id.list);
       
+        DatabaseDAO databaseDAO = new DatabaseDAO(view.getContext());
+        databaseDAO.open();
+
+        List<Patient> patientsList = databaseDAO.getAllpatients();
+        
+        databaseDAO.close();
+        
         listView.setAdapter (new PatientsAdapter (view.getContext(), R.layout.patients_list_item, 
-                R.id.nameView, Arrays.asList (Settings.PATIENTS)));
+                R.id.nameView, patientsList));
 
         return view;
     }
     
     @Override
     public void onListItemClick(ListView l, View v, int position, long id)
-    {
-        showPatient(position);
+    {	
+    	Patient patient = (Patient) l.getItemAtPosition(position);
+    	
+        showPatient( patient );
     }
     
     
-    private void showPatient(int position)
+    private void showPatient(Patient patient)
     {
     	PatientFragment patientFragment = PatientFragment.newInstance();
+    	
+   	 	Bundle bundle = new Bundle();
+   	 	bundle.putString("patient", new Gson().toJson(patient));
+   	 	patientFragment.setArguments(bundle); 
+    	
     	FragmentTransaction ft = getFragmentManager().beginTransaction();
     	
     	ft.remove( getFragmentManager().findFragmentByTag("PatientsFragment") );
@@ -86,7 +93,7 @@ public class PatientsFragment extends ListFragment
     
     // customAdapter
 
-    private class PatientsAdapter extends ArrayAdapter<String>
+    private class PatientsAdapter extends ArrayAdapter<Patient>
     {
     	private Context mContext;
     	private int mLayoutId;
@@ -94,7 +101,7 @@ public class PatientsFragment extends ListFragment
     
     	//constructor
 
-    	public PatientsAdapter(Context context, int layoutId, int textViewResourceId, List<String> items) 
+    	public PatientsAdapter(Context context, int layoutId, int textViewResourceId, List<Patient> items) 
     	{
     		super(context, textViewResourceId, items);
     		mContext = context;
@@ -117,15 +124,16 @@ public class PatientsFragment extends ListFragment
     		View itemView = v;
 
     		TextView phoneView = (TextView) itemView.findViewById(R.id.phoneView);
-    		
-    		phoneView.setText("0000000000");
-    		
-    		String text1 = getItem (position);
     		TextView nameView = (TextView) itemView.findViewById (R.id.nameView);
-    		if (nameView != null) nameView.setText (text1);
-    			
+    		
+    		Patient patient = getItem (position);
+    		
+    		nameView.setText(patient.getFirstname() + "  " + patient.getLastname());
+    		phoneView.setText(patient.getPhone());
+    		
     		return itemView;
     	}
 
     }
+     
 }
