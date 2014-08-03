@@ -110,6 +110,40 @@ public class PatientFragment extends Fragment
 				showPatientEditFragment();		
 			}
 		} );
+        
+        ImageView menuButton = (ImageView) view.findViewById(R.id.personMenuButton);
+        
+        menuButton.setOnClickListener( new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v)
+			{	
+				showPatientMenuFragment();	
+			}
+		} );
+        
+        menuButton.setOnTouchListener( new OnTouchListener(){
+            
+        	@Override
+            public boolean onTouch(View v, MotionEvent me)
+        	{
+                switch (me.getAction())
+                {
+                	case MotionEvent.ACTION_DOWN: 
+                	{
+                		((ImageView) v).setImageResource(R.drawable.person_menu_pressed);
+                		break;
+                	}
+                	case MotionEvent.ACTION_UP:
+                	{
+                		((ImageView) v).setImageResource(R.drawable.person_menu);
+                		break;
+                	}
+                }
+                
+                return false;
+            }	
+        });
           
         editButton.setOnTouchListener( new OnTouchListener(){
             
@@ -160,6 +194,25 @@ public class PatientFragment extends Fragment
         return view;
     }
     
+    private void showPatientMenuFragment()
+    {	
+    	// Make new PatientMenuFragment
+    	PatientMenuFragment patientMenuFragment = PatientMenuFragment.newInstance();
+		
+   	 	Bundle bundle = new Bundle();
+   	 	bundle.putString("patient", new Gson().toJson(patient));
+   	 	patientMenuFragment.setArguments(bundle); 
+    	
+    	// Execute a transaction, replacing any existing fragment with this inside the frame.
+    	FragmentTransaction ft = getFragmentManager().beginTransaction();
+    	
+		ft.remove( getFragmentManager().findFragmentByTag("PatientFragment") );
+    	
+    	ft.replace(R.id.content, patientMenuFragment, "PatientMenuFragment");
+    	ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+    	ft.addToBackStack(null);
+    	ft.commit();
+    }    
     
     private void showPatientsFragment()
     {	

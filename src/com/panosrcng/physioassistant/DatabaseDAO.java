@@ -91,7 +91,64 @@ public class DatabaseDAO
 	}
 	
 	
-	public Long checkIfExists(String firstname, String lastname)
+	public Session createSession(long patient_id, long date, String description, String treatment, String notes)
+	{		
+		ContentValues values = new ContentValues();
+		    
+		values.put(SessionsTable.COLUMN_PATIENT_ID, patient_id);
+		values.put(SessionsTable.COLUMN_DATE, date);
+		values.put(SessionsTable.COLUMN_DESCRIPTION, description);
+		values.put(SessionsTable.COLUMN_TREATMENT, treatment);
+		values.put(SessionsTable.COLUMN_NOTES, notes);
+		
+		long insertId = database.insert(SessionsTable.TABLE_SESSIONS, null, values);
+		
+		/*
+		 * if session created ok
+		 */
+		if( insertId != -1 )
+		{
+			Cursor cursor = database.query(SessionsTable.TABLE_SESSIONS,
+					SessionsTable.allColumns , SessionsTable.COLUMN_ID + " = " + insertId, null,
+					null, null, null);
+		    		
+			cursor.moveToFirst();
+		  	
+			Session newSession = cursorToSession(cursor);
+		    
+			cursor.close();
+				
+			return newSession;
+		}
+			
+		return null;
+	}
+	
+	
+	public Session editSession(Session session, ContentValues values)
+	{
+		int rowAffected = database.update(SessionsTable.TABLE_SESSIONS, values, SessionsTable.COLUMN_ID + " = " + session.getId(), null);
+		
+		if( rowAffected == 1 )
+		{
+			Cursor cursor = database.query(SessionsTable.TABLE_SESSIONS,
+					SessionsTable.allColumns , SessionsTable.COLUMN_ID + " = " + session.getId(), null,
+					null, null, null);
+		   
+			cursor.moveToFirst();
+			
+			Session newSession = cursorToSession(cursor);
+		    
+			cursor.close();
+			
+			return newSession;
+		}
+		
+		return null;	
+	}
+	
+	
+	public Long checkIfPatientExists(String firstname, String lastname)
 	{	
 		Long id = (long) -1;
 		
@@ -113,10 +170,33 @@ public class DatabaseDAO
 		
 		return id;
 	}
+
+	public Long checkIfSessionExists(String description, String treatment)
+	{	
+		Long id = (long) -1;
+		
+		Cursor cursor = database.query(SessionsTable.TABLE_SESSIONS,
+				SessionsTable.allColumns , (SessionsTable.COLUMN_DESCRIPTION + " = '" + description + "'") +
+				" and " + (SessionsTable.COLUMN_TREATMENT + " = '" + treatment + "'"),
+				null, null, null, null);
+		
+		if( cursor.getCount() == 1 )
+		{
+			cursor.moveToFirst();
+			
+			Session session = cursorToSession(cursor);
+		
+			id = session.getId();
+		}
+		
+		cursor.close();
+		
+		return id;
+	}
 	
 	private Patient cursorToPatient(Cursor cursor)
 	{
-		Patient patient= new Patient();
+		Patient patient = new Patient();
 		
 		patient.setId(cursor.getLong(0));
 		patient.setFirstname(cursor.getString(1));
@@ -127,13 +207,39 @@ public class DatabaseDAO
 		
 		return patient;
 	}
+
+	
+	private Session cursorToSession(Cursor cursor)
+	{
+		Session session = new Session();
+		
+		session.setId(cursor.getLong(0));
+		session.setPatientId(cursor.getLong(1));
+		session.setDateTime(cursor.getLong(2));
+		session.setDescription(cursor.getString(3));
+		session.setTreatment(cursor.getString(4));
+		session.setNotes(cursor.getString(5));
+		
+		return session;
+	}
 	
 	
 	public void deletePatient(Patient patient)
 	{    
 		long id = patient.getId();    
 		
+		// delete all sessions for this patient first
+		database.delete(SessionsTable.TABLE_SESSIONS, SessionsTable.COLUMN_PATIENT_ID + " = " + id, null);
+		
+		// delete this patient
 		database.delete(PatientsTable.TABLE_PATIENTS, PatientsTable.COLUMN_ID + " = " + id, null);
+	}
+	
+	public void deleteSession(Session session)
+	{    
+		long id = session.getId();    
+		
+		database.delete(SessionsTable.TABLE_SESSIONS, SessionsTable.COLUMN_ID + " = " + id, null);
 	}
 	
 	  
@@ -159,6 +265,32 @@ public class DatabaseDAO
 		cursor.close();
 		
 		return patients;
+	}
+	
+	public List<Session> getAllsessions(Patient patient)
+	{
+		List<Session> sessions = new ArrayList<Session>();
+
+		Cursor cursor = database.query(SessionsTable.TABLE_SESSIONS, 
+										SessionsTable.allColumns, 
+										SessionsTable.COLUMN_PATIENT_ID + " = " + patient.getId(), 
+										null, null, null, SessionsTable.COLUMN_DATE + " DESC");
+		    
+		cursor.moveToFirst();
+		 
+		while (!cursor.isAfterLast())
+		{
+			Session session = cursorToSession(cursor);
+		    
+			sessions.add(session);
+		    			
+			cursor.moveToNext();
+		}
+		
+		// close the cursor
+		cursor.close();
+		
+		return sessions;
 	}
 	
 }

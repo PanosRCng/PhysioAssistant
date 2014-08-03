@@ -10,26 +10,30 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class GridAdapter extends BaseAdapter {
-
+public class GridAdapter extends BaseAdapter
+{
     private Context mContext;
 	private int mLayoutId;
-
+	private Integer[] patientMenuButtons;
+	private String[] patientMenuTitles;
+	
     public GridAdapter(Context c) {
         mContext = c;
     }
     
 	//constructor
 
-	public GridAdapter(Context context, int layoutId) 
+	public GridAdapter(Context context, int layoutId, Integer[] patientMenuButtons, String[] patientMenuTitles) 
 	{
 		mContext = context;
 		mLayoutId = layoutId;
+		this.patientMenuButtons = patientMenuButtons;
+		this.patientMenuTitles = patientMenuTitles;
 	}
 
     @Override
     public int getCount() {
-        return mThumbIds.length;
+        return patientMenuButtons.length;
     }
 
     @Override
@@ -56,15 +60,12 @@ public class GridAdapter extends BaseAdapter {
 		View itemView = v;
 
 		ImageView image = (ImageView) itemView.findViewById(R.id.gridItemImageView);	
-	    image.setImageResource(mThumbIds[position]);
+	    image.setImageResource(patientMenuButtons[position]);
 
 		TextView tv1 = (TextView) itemView.findViewById (R.id.gridItemTextView);
-		tv1.setText ("title");
+		tv1.setText( patientMenuTitles[position] );
 			
 		return itemView;
     }
 
-    static Integer[] mThumbIds = { R.drawable.button1, R.drawable.button2,
-            R.drawable.button3, R.drawable.button4, R.drawable.button5, R.drawable.button6,
-    };
 }

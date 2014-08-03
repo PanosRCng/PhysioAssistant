@@ -152,7 +152,7 @@ public class TitlesFragment extends ListFragment
     private void showGridFragment()
     {
 		// Make new fragment to show this selection.
-		GridFragment gridFragment = GridFragment.newInstance();
+		PatientMenuFragment gridFragment = PatientMenuFragment.newInstance();
 		
         // Execute a transaction, replacing any existing fragment with this inside the frame.
 		FragmentTransaction ft = getFragmentManager().beginTransaction();

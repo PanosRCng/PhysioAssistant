@@ -1,5 +1,6 @@
 package com.panosrcng.physioassistant;
 
+import com.google.gson.Gson;
 import com.panosrcng.physioassistant.R;
 
 import android.support.v4.app.Fragment;
@@ -14,24 +15,20 @@ import android.widget.GridView;
 import android.widget.TextView;
 
 /**
- * This is a fragment that displays the details of a particular
- * item.
+ * This is a fragment that displays the patient's menu 
  */
 
-public class GridFragment extends Fragment
-{
+public class PatientMenuFragment extends Fragment
+{    
+	private Patient patient;
+	
     /**
-     * Create a new instance of DetailsFragment, initialized to
+     * Create a new instance of PatientMenuFragment, initialized to
      * show the text at 'index'.
      */
-    public static GridFragment newInstance()
+    public static PatientMenuFragment newInstance()
     {
-        GridFragment f = new GridFragment();
-
-        // Supply index input as an argument.
-    //    Bundle args = new Bundle();
-    //    args.putInt("index", index);
-    //    f.setArguments(args);
+        PatientMenuFragment f = new PatientMenuFragment();
 
         return f;
     }
@@ -53,12 +50,18 @@ public class GridFragment extends Fragment
         
         View view = inflater.inflate(R.layout.fragment_grid_layout, container, false);
         
+        Bundle bundle = getArguments();
+        if( bundle  != null && bundle.containsKey("patient") )
+        {    
+        	patient = new Gson().fromJson(bundle.getString("patient"), Patient.class);
+        }
+        
         TextView textView = (TextView) view.findViewById(R.id.gridViewText);
         
-        textView.setText("GridTitle");
+        textView.setText(patient.getLastname() + " " + patient.getFirstname());
         
         GridView gridView = (GridView) view.findViewById(R.id.gridViewButtons);
-        gridView.setAdapter(new GridAdapter(view.getContext(), R.layout.grid_item));
+        gridView.setAdapter(new GridAdapter(view.getContext(), R.layout.grid_item, Settings.patientMenuButtons, Settings.patientMenuTitles));
         
         gridView.setOnItemClickListener(new OnItemClickListener()
         {
@@ -71,17 +74,17 @@ public class GridFragment extends Fragment
 				{
 					case 0:
 						
-						showPatientsFragment();
+						showSessionEditFragment();
+						break;
+						
+					case 1:
+						
+						//
 						break;
 						
 					case 2:
 						
-						//
-						break;
-						
-					case 5:
-						
-						//
+						showSessionsFragment();
 						break;
 						
 					default:
@@ -96,14 +99,37 @@ public class GridFragment extends Fragment
         return view;
     }
     
-    private void showPatientsFragment()
+    private void showSessionEditFragment()
     {
-    	PatientsFragment patientsFragment = PatientsFragment.newInstance();
+    	SessionEditFragment sessionEditFragment = SessionEditFragment.newInstance();
+    	
+   	 	Bundle bundle = new Bundle();
+   	 	bundle.putString("patient", new Gson().toJson(patient));  	 	
+   	 	sessionEditFragment.setArguments(bundle); 
+    	
     	FragmentTransaction ft = getFragmentManager().beginTransaction();
     	
-    	ft.remove( getFragmentManager().findFragmentByTag("GridFragment") );
+    	ft.remove( getFragmentManager().findFragmentByTag("PatientMenuFragment") );
     	
-    	ft.replace(R.id.content, patientsFragment, "PatientsFragment");
+    	ft.replace(R.id.content, sessionEditFragment, "SessionEditFragment");
+    	ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+    	ft.addToBackStack(null);
+        ft.commit();
+    }
+    
+    private void showSessionsFragment()
+    {
+    	SessionsFragment sessionsFragment = SessionsFragment.newInstance();
+    	
+   	 	Bundle bundle = new Bundle();
+   	 	bundle.putString("patient", new Gson().toJson(patient));  	 	
+   	 	sessionsFragment.setArguments(bundle); 
+    	
+    	FragmentTransaction ft = getFragmentManager().beginTransaction();
+    	
+    	ft.remove( getFragmentManager().findFragmentByTag("PatientMenuFragment") );
+    	
+    	ft.replace(R.id.content, sessionsFragment, "SessionsFragment");
     	ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
     	ft.addToBackStack(null);
         ft.commit();

@@ -13,17 +13,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class PatientsFragment extends ListFragment
+public class SessionsFragment extends ListFragment
 {	
+	Patient patient;
+	
     /*
-     * Create a new instance of PatientsFragment
+     * Create a new instance of SessionsFragment
      */
-    public static PatientsFragment newInstance()
+    public static SessionsFragment newInstance()
     {
-    	PatientsFragment f = new PatientsFragment();
+    	SessionsFragment f = new SessionsFragment();
 
         return f;
     }
@@ -43,22 +46,29 @@ public class PatientsFragment extends ListFragment
             return null;
         }      
         
-        View view = inflater.inflate(R.layout.fragment_patients_layout, container, false);
+        View view = inflater.inflate(R.layout.fragment_sessions_layout, container, false);
         
-        TextView textView = (TextView) view.findViewById(R.id.patientsViewText);
-        textView.setText("PatientsTitle");
+        Bundle bundle = getArguments();
+        
+        if( bundle  != null && bundle.containsKey("patient") )
+        {    
+        	patient = new Gson().fromJson(bundle.getString("patient"), Patient.class);
+        }
+        
+        TextView textView = (TextView) view.findViewById(R.id.sessionsViewText);
+        textView.setText(patient.getLastname() + "  " + patient.getFirstname());
         
         ListView listView = (ListView) view.findViewById(android.R.id.list);
       
         DatabaseDAO databaseDAO = new DatabaseDAO(view.getContext());
         databaseDAO.open();
 
-        List<Patient> patientsList = databaseDAO.getAllpatients();
+        List<Session> sessionsList = databaseDAO.getAllsessions(patient);
         
         databaseDAO.close();
         
-        listView.setAdapter (new PatientsAdapter (view.getContext(), R.layout.patients_list_item, 
-                R.id.nameView, patientsList));
+        listView.setAdapter (new SessionsAdapter (view.getContext(), R.layout.sessions_list_item, 
+                R.id.nameView, sessionsList));
 
         return view;
     }
@@ -66,25 +76,26 @@ public class PatientsFragment extends ListFragment
     @Override
     public void onListItemClick(ListView l, View v, int position, long id)
     {	
-    	Patient patient = (Patient) l.getItemAtPosition(position);
+    	Session session = (Session) l.getItemAtPosition(position);
     	
-        showPatient( patient );
+        showSession( session );
     }
     
     
-    private void showPatient(Patient patient)
+    private void showSession(Session session)
     {
-    	PatientFragment patientFragment = PatientFragment.newInstance();
+    	SessionFragment sessionFragment = SessionFragment.newInstance();
     	
    	 	Bundle bundle = new Bundle();
+   	 	bundle.putString("session", new Gson().toJson(session));
    	 	bundle.putString("patient", new Gson().toJson(patient));
-   	 	patientFragment.setArguments(bundle); 
+   	 	sessionFragment.setArguments(bundle); 
     	
     	FragmentTransaction ft = getFragmentManager().beginTransaction();
     	
-    	ft.remove( getFragmentManager().findFragmentByTag("PatientsFragment") );
+    	ft.remove( getFragmentManager().findFragmentByTag("SessionsFragment") );
     	
-    	ft.replace(R.id.content, patientFragment, "PatientFragment");
+    	ft.replace(R.id.content, sessionFragment, "SessionFragment");
     	ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
     	ft.addToBackStack(null);
         ft.commit();
@@ -93,7 +104,7 @@ public class PatientsFragment extends ListFragment
     
     // customAdapter
 
-    private class PatientsAdapter extends ArrayAdapter<Patient>
+    private class SessionsAdapter extends ArrayAdapter<Session>
     {
     	private Context mContext;
     	private int mLayoutId;
@@ -101,7 +112,7 @@ public class PatientsFragment extends ListFragment
     
     	//constructor
 
-    	public PatientsAdapter(Context context, int layoutId, int textViewResourceId, List<Patient> items) 
+    	public SessionsAdapter(Context context, int layoutId, int textViewResourceId, List<Session> items) 
     	{
     		super(context, textViewResourceId, items);
     		mContext = context;
@@ -123,13 +134,14 @@ public class PatientsFragment extends ListFragment
 
     		View itemView = v;
 
-    		TextView phoneView = (TextView) itemView.findViewById(R.id.phoneView);
-    		TextView nameView = (TextView) itemView.findViewById (R.id.nameView);
+    		TextView descriptionView = (TextView) itemView.findViewById(R.id.descriptionView);
+    		TextView treatmentView = (TextView) itemView.findViewById (R.id.dateView);
+    		ImageView imageView = (ImageView) itemView.findViewById(R.id.sessionStatus);
     		
-    		Patient patient = getItem (position);
+    		Session session = getItem (position);
     		
-    		nameView.setText(patient.getFirstname() + "  " + patient.getLastname());
-    		phoneView.setText("tel:  " + patient.getPhone());
+    		descriptionView.setText(session.getDescription());
+    		treatmentView.setText(session.getDateStr());
     		
     		return itemView;
     	}

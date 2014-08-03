@@ -152,7 +152,7 @@ public class PatientEditFragment extends Fragment
 						 // check first if there is not a patient with this firstname and lastname 
 						 // or is the patient we want to edit
 						 //
-						Long checkId = databaseDAO.checkIfExists(firstname, lastname);
+						Long checkId = databaseDAO.checkIfPatientExists(firstname, lastname);
 						
 						if( (checkId == -1) || (checkId == patient.getId()) )
 						{
@@ -176,7 +176,7 @@ public class PatientEditFragment extends Fragment
 						//
 						 // check first if there is not a patient with this firstname and lastname
 						 //
-						if( (databaseDAO.checkIfExists(firstname, lastname)) == -1  )
+						if( (databaseDAO.checkIfPatientExists(firstname, lastname)) == -1  )
 						{
 							newPatient = databaseDAO.createPatient(firstname,
 									lastname,

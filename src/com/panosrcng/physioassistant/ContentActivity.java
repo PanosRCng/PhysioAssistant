@@ -82,8 +82,8 @@ public class ContentActivity extends FragmentActivity
     
     private void showGridFragment()
     {
-        GridFragment gridFragment = (GridFragment) getSupportFragmentManager().findFragmentById(R.id.content);
-        gridFragment = GridFragment.newInstance();
+        PatientMenuFragment gridFragment = (PatientMenuFragment) getSupportFragmentManager().findFragmentById(R.id.content);
+        gridFragment = PatientMenuFragment.newInstance();
     	FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
     	ft.replace(android.R.id.content, gridFragment, "GridFragment");
     	ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);

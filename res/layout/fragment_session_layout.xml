@@ -5,7 +5,7 @@
     android:orientation="vertical" >
     	
     <TextView
-    	android:id="@+id/patientTitleTextView"
+    	android:id="@+id/sessionTitleTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -27,7 +27,7 @@
     			android:layout_height="wrap_content"
     			android:paddingTop="20dp"
     			android:orientation="horizontal" >
-   			
+    	
 	      	    <LinearLayout 
     				android:layout_width="fill_parent"
     				android:layout_height="wrap_content"
@@ -35,53 +35,65 @@
     				android:orientation="horizontal" >
 	    
        				<ImageView
-       			  		android:id="@+id/personMenuButton"
+       			  		android:id="@+id/personProfileButton"
         				android:layout_width="wrap_content"
         				android:layout_height="wrap_content"
         				android:paddingLeft="20dp"
         				android:clickable="true"
-        				android:src="@drawable/person_menu"/>
+        				android:src="@drawable/person_button"/>
        			</LinearLayout>
 	      	    
-   				<LinearLayout 
+	      	    <LinearLayout 
     				android:layout_width="fill_parent"
     				android:layout_height="wrap_content"
     				android:layout_weight="1"
     				android:orientation="horizontal" >
-    	
+	      	    
 	    			<View
             		android:layout_width="0dp"
             		android:layout_height="0dp"
             		android:layout_weight="1" />  
 	    
        				<ImageView
-       			  		android:id="@+id/editButton"
+       			 		android:id="@+id/sessionEditButton"
         				android:layout_width="wrap_content"
         				android:layout_height="wrap_content"
         				android:paddingRight="20dp"
         				android:clickable="true"
-        				android:src="@drawable/person_edit"/>
+        				android:src="@drawable/session_edit"/>
        				<ImageView
-       			    	android:id="@+id/deleteButton"
+       			    	android:id="@+id/sessionDeleteButton"
         				android:layout_width="wrap_content"
         				android:layout_height="wrap_content"
         				android:paddingRight="20dp"
         				android:clickable="true"
-        				android:src="@drawable/person_delete"/>	
-        	
+        				android:src="@drawable/session_delete"/>	
 				</LinearLayout>
-				
+					
    			</LinearLayout>
-   			
+   			   			
 			<LinearLayout 
     			android:layout_width="fill_parent"
     			android:layout_height="wrap_content"
     			android:paddingLeft="10dp"
     			android:paddingBottom="50dp"
     			android:orientation="vertical" >
+				
+				<TextView
+        			android:id="@+id/sessionDateTextView"
+        			android:layout_width="wrap_content"
+        			android:layout_height="wrap_content"
+        			android:layout_gravity="right"
+        			android:gravity="right"
+        			android:textColor="@color/grey"
+        			android:textStyle="italic"
+        			android:textAppearance="?android:attr/textAppearanceMedium"
+        			android:paddingTop="20dp"
+        			android:paddingRight="20dp"/>	
+	
 	
 				<TextView
-        			android:id="@+id/patientFirstnameLabelTextView"
+        			android:id="@+id/sessionDescriptionLabelTextView"
         			android:layout_width="wrap_content"
         			android:layout_height="wrap_content"
         			android:layout_gravity="left"
@@ -91,7 +103,7 @@
         			android:textAppearance="?android:attr/textAppearanceMedium"
         			android:paddingTop="20dp"/>	
 				<TextView
-        			android:id="@+id/patientFirstnameTextView"
+        			android:id="@+id/sessionDescriptionTextView"
         			android:layout_width="wrap_content"
         			android:layout_height="wrap_content"
         			android:layout_gravity="left"
@@ -107,33 +119,7 @@
 	
 	
 				<TextView
-        			android:id="@+id/patientLastnameLabelTextView"
-        			android:layout_width="wrap_content"
-        			android:layout_height="wrap_content"
-        			android:layout_gravity="left"
-        			android:gravity="left"
-        			android:textColor="@color/grey"
-        			android:textStyle="italic"
-        			android:textAppearance="?android:attr/textAppearanceMedium"
-        			android:paddingTop="20dp"/>	
-				<TextView
-        			android:id="@+id/patientLastnameTextView"
-        			android:layout_width="wrap_content"
-        			android:layout_height="wrap_content"
-        			android:layout_gravity="left"
-        			android:gravity="left"
-        			android:textColor="@color/black"
-        			android:textStyle="bold"
-        			android:textAppearance="?android:attr/textAppearanceMedium"/>
-				<View
-    				android:layout_width="fill_parent"
-        			android:layout_height="0.2dp"
-        			android:visibility="visible"
-        			android:background="@android:color/darker_gray"/>
-	
-	
-				<TextView
-        			android:id="@+id/patientPhoneLabelTextView"
+        			android:id="@+id/sessionTreatmentLabelTextView"
         			android:layout_width="wrap_content"
         			android:layout_height="wrap_content"
         			android:layout_gravity="left"
@@ -143,7 +129,7 @@
         			android:textAppearance="?android:attr/textAppearanceMedium"
         			android:paddingTop="20dp"/>
 				<TextView
-        			android:id="@+id/patientPhoneTextView"
+        			android:id="@+id/sessionTreatmentTextView"
         			android:layout_width="wrap_content"
         			android:layout_height="wrap_content"
         			android:layout_gravity="left"
@@ -158,7 +144,7 @@
         			android:background="@android:color/darker_gray"/>
 				
 				<TextView
-        			android:id="@+id/patientAddressLabelTextView"
+        			android:id="@+id/sessionNotesLabelTextView"
         			android:layout_width="wrap_content"
         			android:layout_height="wrap_content"
         			android:layout_gravity="left"
@@ -168,7 +154,7 @@
         			android:textAppearance="?android:attr/textAppearanceMedium"
         			android:paddingTop="20dp"/>
 				<TextView
-        			android:id="@+id/patientAddressTextView"
+        			android:id="@+id/sessionNotesTextView"
         			android:layout_width="wrap_content"
         			android:layout_height="wrap_content"
         			android:layout_gravity="left"
@@ -182,31 +168,6 @@
         			android:visibility="visible"
         			android:background="@android:color/darker_gray"/>
 				
-				<TextView
-        			android:id="@+id/patientNotesLabelTextView"
-        			android:layout_width="wrap_content"
-        			android:layout_height="wrap_content"
-        			android:layout_gravity="left"
-        			android:gravity="left"
-        			android:textColor="@color/grey"
-        			android:textStyle="italic"
-        			android:textAppearance="?android:attr/textAppearanceMedium"
-        			android:paddingTop="20dp"/>
-				<TextView
-        			android:id="@+id/patientNotesTextView"
-        			android:layout_width="wrap_content"
-        			android:layout_height="wrap_content"
-        			android:layout_gravity="left"
-        			android:gravity="left"
-        			android:textColor="@color/black"
-        			android:textStyle="bold"
-        			android:textAppearance="?android:attr/textAppearanceMedium"/>
-				<View
-    				android:layout_width="fill_parent"
-        			android:layout_height="0.2dp"
-        			android:visibility="visible"
-        			android:background="@android:color/darker_gray"/>
-	
 			</LinearLayout>
 		</LinearLayout>
 	</ScrollView>

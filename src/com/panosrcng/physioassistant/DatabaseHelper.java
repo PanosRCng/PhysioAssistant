@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper
 {
 	private static final String DATABASE_NAME = "physioassistant.db";
-	private static final int DATABASE_VERSION = 3;
+	private static final int DATABASE_VERSION = 6;
 
 	public DatabaseHelper(Context context)
 	{
@@ -21,6 +21,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
 	public void onCreate(SQLiteDatabase database)
 	{
 		PatientsTable.onCreate(database);
+		SessionsTable.onCreate(database);
 	}
 
 	/*
@@ -30,6 +31,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
 	public void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion)
 	{
 		PatientsTable.onUpgrade(database, oldVersion, newVersion);
+		SessionsTable.onUpgrade(database, oldVersion, newVersion);
 	}
 	
 }
