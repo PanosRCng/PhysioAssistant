@@ -3,15 +3,21 @@ package com.panosrcng.physioassistant;
 import com.google.gson.Gson;
 import com.panosrcng.physioassistant.R;
 
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.telephony.TelephonyManager;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnTouchListener;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 
 
@@ -80,6 +86,61 @@ public class PatientFragment extends Fragment
         notesLabelTextView.setText("Notes:");
         TextView notesTextView = (TextView) view.findViewById(R.id.patientNotesTextView);
         notesTextView.setText(patient.getNotes());
+        
+        //ImageView callButton = (ImageView) view.findViewById(R.id.personCallButton);
+        
+        ImageView callButton;
+        
+        TelephonyManager telMgr = (TelephonyManager)getActivity().getSystemService(Context.TELEPHONY_SERVICE);
+        
+        if( telMgr.getLine1Number() != null )
+        {
+        	LinearLayout phoneLinearLayout = (LinearLayout) view.findViewById(R.id.phoneLinearLayout);
+        	
+            callButton = new ImageView(getActivity());
+            
+            callButton.setLayoutParams(new LayoutParams( LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+            callButton.setPadding(20, 0, 0, 0);
+            callButton.setClickable(true);
+            callButton.setImageResource(R.drawable.phone_button);
+            
+            callButton.setOnClickListener( new View.OnClickListener() {
+    			
+    			@Override
+    			public void onClick(View v)
+    			{	
+    				Intent intent = new Intent(Intent.ACTION_CALL);
+
+    				intent.setData(Uri.parse("tel:" + patient.getPhone()));
+    				getActivity().startActivity(intent);
+    			}
+    		} );
+            
+            callButton.setOnTouchListener( new OnTouchListener(){
+                
+            	@Override
+                public boolean onTouch(View v, MotionEvent me)
+            	{
+                    switch (me.getAction())
+                    {
+                    	case MotionEvent.ACTION_DOWN: 
+                    	{
+                    		((ImageView) v).setImageResource(R.drawable.phone_button_pressed);
+                    		break;
+                    	}
+                    	case MotionEvent.ACTION_UP:
+                    	{
+                    		((ImageView) v).setImageResource(R.drawable.phone_button);
+                    		break;
+                    	}
+                    }
+                    
+                    return false;
+                }	
+            });
+            
+            phoneLinearLayout.addView(callButton);
+        }
         
         
         ImageView deleteButton = (ImageView) view.findViewById(R.id.deleteButton);
