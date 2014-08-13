@@ -1,11 +1,18 @@
 package com.panosrcng.physioassistant;
 
-import java.util.Date;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 import com.google.gson.Gson;
 import com.panosrcng.physioassistant.R;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
@@ -14,13 +21,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnTouchListener;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.LinearLayout.LayoutParams;
 
 
 public class SessionFragment extends Fragment
 {	
-	Session session;
-	Patient patient;
+	private Session session;
+	private Patient patient;
+	private View view;
+	private String photoFilename;
+	private DatabaseDAO databaseDAO;
+	private Utils utils;
 	
     /**
      * Create a new instance of SessionFragment
@@ -47,7 +60,7 @@ public class SessionFragment extends Fragment
             return null;
         }      
         
-        View view = inflater.inflate(R.layout.fragment_session_layout, container, false);
+        view = inflater.inflate(R.layout.fragment_session_layout, container, false);
         
         Bundle bundle = getArguments();
         
@@ -60,6 +73,11 @@ public class SessionFragment extends Fragment
         {    
         	patient = new Gson().fromJson(bundle.getString("patient"), Patient.class);
         }
+        
+        databaseDAO = new DatabaseDAO(view.getContext());
+        databaseDAO.open();
+        
+        utils = new Utils();
         
         TextView titleTextView = (TextView) view.findViewById(R.id.sessionTitleTextView);
         titleTextView.setText(patient.getLastname() + " " + patient.getFirstname());
@@ -82,6 +100,23 @@ public class SessionFragment extends Fragment
         TextView notesTextView = (TextView) view.findViewById(R.id.sessionNotesTextView);
         notesTextView.setText(session.getNotes());
 
+        TextView photoNotesLabelTextView = (TextView) view.findViewById(R.id.sessionPhotoNotesLabelTextView);
+        photoNotesLabelTextView.setText("Photo notes:");
+
+        // populate photo notes
+        populatePhotoNotes();
+        
+        ImageView photoButton = (ImageView) view.findViewById(R.id.photoButton);
+        
+        photoButton.setOnClickListener( new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v)
+			{	
+				takePicture();		
+			}
+		} );
+        
         ImageView profileButton = (ImageView) view.findViewById(R.id.personProfileButton);
         
         profileButton.setOnClickListener( new View.OnClickListener() {
@@ -99,13 +134,8 @@ public class SessionFragment extends Fragment
 			
 			@Override
 			public void onClick(View v)
-			{	
-		        DatabaseDAO databaseDAO = new DatabaseDAO(v.getContext());
-		        databaseDAO.open();
-				
+			{					
 				databaseDAO.deleteSession(session);
-				
-				databaseDAO.close();
 				
 				showSessionsFragment();		
 			}
@@ -122,6 +152,30 @@ public class SessionFragment extends Fragment
 			}
 		} );
                 
+        
+        photoButton.setOnTouchListener( new OnTouchListener(){
+            
+        	@Override
+            public boolean onTouch(View v, MotionEvent me)
+        	{
+                switch (me.getAction())
+                {
+                	case MotionEvent.ACTION_DOWN: 
+                	{
+                		((ImageView) v).setImageResource(R.drawable.photo_button_pressed);
+                		break;
+                	}
+                	case MotionEvent.ACTION_UP:
+                	{
+                		((ImageView) v).setImageResource(R.drawable.photo_button);
+                		break;
+                	}
+                }
+                
+                return false;
+            }	
+        });
+        
         editButton.setOnTouchListener( new OnTouchListener(){
             
         	@Override
@@ -169,6 +223,50 @@ public class SessionFragment extends Fragment
         });
 
         return view;
+    }
+    
+    @Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        databaseDAO.open();
+        
+        if (requestCode == 0 && resultCode == -1)
+        {            
+			databaseDAO.createPhoto(photoFilename, patient.getId(), session.getId());
+
+			
+			
+			populatePhotoNotes();
+        }
+    }
+    
+    
+    private void takePicture()
+    {
+    	Utils utils = new Utils();
+        
+    	photoFilename = Long.toString( System.currentTimeMillis() ) + ".jpg";
+    	
+        String file = utils.getPhotosDirectoryPath() + "/" + photoFilename;
+        File newfile = new File(file);
+        
+        try
+        {
+            newfile.createNewFile();
+        }
+        catch(IOException e)
+        {
+        	//
+        }       
+
+        Uri outputFileUri = Uri.fromFile(newfile);
+
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); 
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
+
+        startActivityForResult(cameraIntent, 0);
     }
         
     private void showSessionsFragment()
@@ -236,6 +334,77 @@ public class SessionFragment extends Fragment
     	ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
     	ft.addToBackStack(null);
         ft.commit();
+    }
+    
+    /*
+     * populate photo notes
+     */
+    public void populatePhotoNotes()
+    {
+    	final List<Photo> photos = databaseDAO.getAllPhotos(session);
+        
+        LinearLayout photosView = (LinearLayout) view.findViewById(R.id.photosSessionView);
+        
+        photosView.removeAllViews();
+        
+        if( photos.size() > 0 )
+        {
+        	for(int i=0; i<photos.size(); i++)
+        	{
+        		Photo myPhoto = photos.get(i);
+        	
+        		ImageView myPhotoView = new ImageView(getActivity());
+        	
+        		myPhotoView.setLayoutParams(new LayoutParams( LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+        		myPhotoView.setPadding(0, 0, 10, 0);
+        		myPhotoView.setClickable(true);
+  
+        		Bitmap btm = BitmapFactory.decodeFile( utils.getPhotosDirectoryPath() + "/" + myPhoto.getFilename() );
+        	    Bitmap resizedbitmap = Bitmap.createScaledBitmap(btm, 70, 70, true);
+        		myPhotoView.setImageBitmap( resizedbitmap );
+        		myPhotoView.setId(i);
+        		
+        		myPhotoView.setOnClickListener( new View.OnClickListener() {
+    			
+        			@Override
+        			public void onClick(View v)
+        			{	
+        				Photo selectedPhoto = photos.get(v.getId());
+        				
+        				Intent intent = new Intent();
+        				intent.setAction(android.content.Intent.ACTION_VIEW);
+        				intent.setDataAndType(Uri.fromFile(new File(utils.getPhotosDirectoryPath() + "/" + selectedPhoto.getFilename())), "image/jpg");
+        				startActivity(intent);
+        			}
+        		} );
+        		
+        		photosView.addView(myPhotoView);
+        	}
+        }
+        else
+        {
+        	// (!) pending delete
+        	TextView noPhotosText = new TextView(getActivity());
+    		noPhotosText.setLayoutParams(new LayoutParams( LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+        	noPhotosText.setPadding(0, 10, 0, 10);
+        	noPhotosText.setText(" ");
+        	
+        	photosView.addView(noPhotosText);
+        }
+    }
+    
+    @Override
+    public void onResume()
+    {
+      databaseDAO.open();
+      super.onResume();
+    }
+
+    @Override
+	public void onPause()
+    {
+      databaseDAO.close();
+      super.onPause();
     }
     
 }

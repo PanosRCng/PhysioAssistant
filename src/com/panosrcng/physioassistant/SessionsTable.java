@@ -42,6 +42,9 @@ public class SessionsTable
 		database.execSQL(CREATE_SESSIONS_TABLE);
 	}
 
+	/*
+	 *  Database upgrade SQL statement
+	 */
 	public static void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion)
 	{
 		Log.w(PatientsTable.class.getName(), "Upgrading database from version "

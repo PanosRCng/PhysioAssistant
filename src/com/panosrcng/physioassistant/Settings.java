@@ -8,6 +8,9 @@ import com.panosrcng.physioassistant.R;
 
 public final class Settings
 {
+	public static final String PROGRAM_DIRECTORY = "PhysioAssistant";
+	public static final String PHOTOS_DIRECTORY = "photos";
+	public static final String BACKUPS_DIRECTORY = "backups";
 	
     public static final String[] TITLES = {
     	"patients",   

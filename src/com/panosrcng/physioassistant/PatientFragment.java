@@ -87,61 +87,45 @@ public class PatientFragment extends Fragment
         TextView notesTextView = (TextView) view.findViewById(R.id.patientNotesTextView);
         notesTextView.setText(patient.getNotes());
         
-        //ImageView callButton = (ImageView) view.findViewById(R.id.personCallButton);
-        
-        ImageView callButton;
-        
-        TelephonyManager telMgr = (TelephonyManager)getActivity().getSystemService(Context.TELEPHONY_SERVICE);
-        
-        if( telMgr.getLine1Number() != null )
-        {
-        	LinearLayout phoneLinearLayout = (LinearLayout) view.findViewById(R.id.phoneLinearLayout);
-        	
-            callButton = new ImageView(getActivity());
+        ImageView callButton = (ImageView) view.findViewById(R.id.callButton);
             
-            callButton.setLayoutParams(new LayoutParams( LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-            callButton.setPadding(20, 0, 0, 0);
-            callButton.setClickable(true);
-            callButton.setImageResource(R.drawable.phone_button);
-            
-            callButton.setOnClickListener( new View.OnClickListener() {
+        callButton.setOnClickListener( new View.OnClickListener() {
     			
-    			@Override
-    			public void onClick(View v)
-    			{	
+    		@Override
+    		public void onClick(View v)
+    		{	
+    			if(patient.getPhone().length() > 0)
+    			{
     				Intent intent = new Intent(Intent.ACTION_CALL);
 
     				intent.setData(Uri.parse("tel:" + patient.getPhone()));
     				getActivity().startActivity(intent);
     			}
-    		} );
+    		}
+    	} );
             
-            callButton.setOnTouchListener( new OnTouchListener(){
+        callButton.setOnTouchListener( new OnTouchListener(){
                 
-            	@Override
-                public boolean onTouch(View v, MotionEvent me)
-            	{
-                    switch (me.getAction())
+            @Override
+            public boolean onTouch(View v, MotionEvent me)
+            {
+            	switch (me.getAction())
+                {
+                	case MotionEvent.ACTION_DOWN: 
                     {
-                    	case MotionEvent.ACTION_DOWN: 
-                    	{
-                    		((ImageView) v).setImageResource(R.drawable.phone_button_pressed);
-                    		break;
-                    	}
-                    	case MotionEvent.ACTION_UP:
-                    	{
-                    		((ImageView) v).setImageResource(R.drawable.phone_button);
-                    		break;
-                    	}
+                    	((ImageView) v).setImageResource(R.drawable.phone_button_pressed);
+                    	break;
                     }
+                    case MotionEvent.ACTION_UP:
+                    {
+                    	((ImageView) v).setImageResource(R.drawable.phone_button);
+                    	break;
+                    }
+                }
                     
-                    return false;
-                }	
-            });
-            
-            phoneLinearLayout.addView(callButton);
-        }
-        
+                return false;
+            }	
+        });
         
         ImageView deleteButton = (ImageView) view.findViewById(R.id.deleteButton);
         
